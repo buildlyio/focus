@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildly Focus</title>
+<meta name="description" content="One clear next step. Buildly Focus gathers work from email, calendar, notes, and AI tools — then surfaces what actually deserves your attention right now.">
+<meta property="og:title" content="Buildly Focus">
+<meta property="og:description" content="One clear next step. Native iOS + macOS task manager from Buildly Labs.">
+<meta property="og:image" content="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* ── Tokens ─────────────────────────────────────────────────── */
+:root {
+  --bg:         #EEF1F2;
+  --bg2:        #E3E8EC;
+  --surface:    #FFFFFF;
+  --surface2:   #F6F8F9;
+  --border:     #D4DCE3;
+  --text:       #171C24;
+  --text2:      #66717C;
+  --text3:      #99A5AE;
+  --orange:     #FF9638;
+  --orange-dim: rgba(255,150,56,.12);
+  --aqua:       #5EDBE5;
+  --aqua-dim:   rgba(94,219,229,.1);
+  --green:      #43C38A;
+  --graphite:   #171C24;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #171C24;
+    --bg2:      #1C2230;
+    --surface:  #1E2530;
+    --surface2: #232D3D;
+    --border:   #2A3447;
+    --text:     #F2F4F7;
+    --text2:    #8FA0B6;
+    --text3:    #66717C;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:       #171C24;
+  --bg2:      #1C2230;
+  --surface:  #1E2530;
+  --surface2: #232D3D;
+  --border:   #2A3447;
+  --text:     #F2F4F7;
+  --text2:    #8FA0B6;
+  --text3:    #66717C;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+/* ── Type ───────────────────────────────────────────────────── */
+.display {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  line-height: 1.1;
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+/* ── Nav ────────────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 clamp(20px, 5vw, 80px);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: var(--text);
+}
+.nav-logo img {
+  width: 32px; height: 32px; border-radius: 8px;
+}
+.nav-logo-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.nav-logo-name span { color: var(--orange); }
+.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+.nav-links a {
+  color: var(--text2); text-decoration: none;
+  font-size: 14px; font-weight: 500; transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--orange) !important; color: #fff !important;
+  padding: 8px 18px !important; border-radius: 22px;
+  font-weight: 700 !important; transition: opacity .2s !important;
+}
+.nav-cta:hover { opacity: .85; }
+@media (max-width: 640px) { .nav-links { display: none; } }
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: clamp(60px, 8vh, 100px) clamp(20px, 5vw, 80px);
+  max-width: 1160px; margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-visual { order: -1; }
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border); border-radius: 22px;
+  padding: 5px 14px; font-size: 12px; font-weight: 600;
+  color: var(--text2); margin-bottom: 24px;
+  background: var(--surface);
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+}
+.hero h1 {
+  font-size: clamp(40px, 5.5vw, 72px);
+  margin-bottom: 20px; color: var(--text);
+}
+.hero h1 em { font-style: italic; color: var(--orange); }
+.hero-sub {
+  font-size: 18px; color: var(--text2);
+  line-height: 1.7; margin-bottom: 36px; max-width: 480px;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--orange); color: #fff; border: none;
+  border-radius: 22px; padding: 13px 28px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: opacity .2s, transform .1s;
+}
+.btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+.btn-secondary {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border); border-radius: 22px;
+  padding: 13px 28px; font-size: 15px; font-weight: 600;
+  text-decoration: none; display: inline-block;
+  transition: background .2s;
+}
+.btn-secondary:hover { background: var(--surface); }
+.hero-platforms {
+  margin-top: 28px; display: flex; align-items: center;
+  gap: 8px; font-size: 12px; color: var(--text3); font-weight: 500;
+}
+.platform-tag {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 3px 9px;
+  font-size: 11px; font-weight: 700; color: var(--text2);
+}
+
+/* Hero visual: the flow image */
+.hero-visual {
+  position: relative; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,.18);
+}
+.hero-visual img { width: 100%; border-radius: 20px; }
+.hero-logo-badge {
+  position: absolute; bottom: 20px; right: 20px;
+  background: rgba(23,28,36,.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,150,56,.25);
+  border-radius: 16px; padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-logo-badge img { width: 36px; height: 36px; border-radius: 10px; }
+.hero-logo-badge-text { font-size: 13px; font-weight: 700; color: #F2F4F7; }
+.hero-logo-badge-sub  { font-size: 11px; color: rgba(242,244,247,.45); }
+
+/* ── Strip ──────────────────────────────────────────────────── */
+.strip {
+  background: var(--graphite);
+  color: rgba(255,255,255,.45);
+  padding: 14px clamp(20px, 5vw, 80px);
+  display: flex; gap: 48px; justify-content: center;
+  flex-wrap: wrap; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.strip strong { color: var(--orange); }
+
+/* ── Sections ───────────────────────────────────────────────── */
+section { padding: clamp(60px, 8vw, 110px) clamp(20px, 5vw, 80px); }
+.section-inner { max-width: 1080px; margin: 0 auto; }
+.section-header { max-width: 600px; margin-bottom: 52px; }
+.section-header h2 { font-size: clamp(30px, 4vw, 50px); margin-top: 10px; }
+.section-header p { margin-top: 14px; color: var(--text2); font-size: 17px; line-height: 1.7; }
+
+/* ── Steps ──────────────────────────────────────────────────── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2px; border-radius: 22px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.step {
+  background: var(--surface); padding: 34px 28px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.step-num {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  background: var(--surface2); color: var(--text2);
+}
+.step:last-child .step-num { background: var(--orange); color: #fff; }
+.step h3 { font-size: 16px; font-weight: 700; color: var(--text); }
+.step p  { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+/* ── Features ───────────────────────────────────────────────── */
+.features-alt { background: var(--bg2); }
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
+}
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 26px;
+  display: flex; flex-direction: column; gap: 11px;
+  transition: border-color .2s;
+}
+.feature-card:hover { border-color: var(--orange); }
+.feature-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.fi-orange { background: var(--orange-dim); }
+.fi-aqua   { background: var(--aqua-dim); }
+.fi-green  { background: rgba(67,195,138,.1); }
+.feature-card h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+.feature-card p  { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+/* ── Sources ────────────────────────────────────────────────── */
+.sources-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.source-chip {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 7px 15px;
+  font-size: 13px; font-weight: 600; color: var(--text2);
+}
+.sc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--aqua); }
+
+/* ── Priority demo ──────────────────────────────────────────── */
+.demo-wrap {
+  margin-top: 60px; display: flex; gap: 48px;
+  align-items: flex-start; flex-wrap: wrap;
+}
+.demo-label { flex: 1; min-width: 260px; }
+.demo-label p { color: var(--text2); font-size: 15px; line-height: 1.7; max-width: 360px; margin-top: 12px; }
+.demo-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 28px; width: 100%; max-width: 520px;
+}
+.demo-task {
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 15px 0; border-bottom: 1px solid var(--border);
+}
+.demo-task:last-child { border-bottom: none; }
+.demo-circle {
+  width: 19px; height: 19px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px;
+}
+.demo-task-body { flex: 1; }
+.demo-task-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.demo-task-meta  { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.demo-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; border-radius: 22px;
+  padding: 3px 10px; flex-shrink: 0;
+}
+.badge-now  { background: rgba(255,150,56,.15); color: var(--orange); }
+.badge-next { background: rgba(94,219,229,.1);  color: var(--aqua); }
+.badge-done { background: rgba(67,195,138,.1);  color: var(--green); }
+
+/* ── CTA ────────────────────────────────────────────────────── */
+.cta-section {
+  background: var(--graphite);
+  text-align: center;
+  padding: clamp(80px, 10vw, 130px) clamp(20px, 5vw, 80px);
+}
+.cta-section .eyebrow { color: var(--aqua); }
+.cta-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,150,56,.1); border: 1px solid rgba(255,150,56,.22);
+  border-radius: 22px; padding: 5px 14px;
+  font-size: 12px; font-weight: 700; color: var(--orange);
+  margin-bottom: 24px;
+}
+.cta-h2 {
+  font-size: clamp(36px, 5vw, 64px);
+  color: #F2F4F7; margin-bottom: 14px;
+}
+.cta-h2 em { color: var(--orange); }
+.cta-sub { color: rgba(242,244,247,.5); font-size: 18px; max-width: 440px; margin: 0 auto 36px; line-height: 1.7; }
+.install-block {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 14px; padding: 16px 22px;
+  font-family: 'Courier New', monospace; font-size: 14px;
+  color: var(--aqua); max-width: 480px; margin: 0 auto 28px;
+  text-align: left; cursor: pointer; transition: background .2s;
+  position: relative;
+  overflow: hidden;
+}
+.install-block::after {
+  content: 'copy';
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,.25); letter-spacing: 0.07em; text-transform: uppercase;
+}
+.install-block:hover { background: rgba(255,255,255,.07); }
+.install-prompt { color: rgba(255,255,255,.25); user-select: none; }
+.cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-secondary-dark {
+  background: transparent; color: rgba(242,244,247,.65);
+  border: 1px solid rgba(255,255,255,.14); border-radius: 22px;
+  padding: 13px 28px; font-size: 15px; font-weight: 600;
+  text-decoration: none; display: inline-block;
+  transition: background .2s, border-color .2s;
+}
+.btn-secondary-dark:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.25); }
+.cta-fine { color: rgba(242,244,247,.18); font-size: 12px; margin-top: 20px; }
+
+/* ── App icon hero ──────────────────────────────────────────── */
+.app-icon-wrap {
+  width: 96px; height: 96px; border-radius: 22px; overflow: hidden;
+  margin: 0 auto 32px; box-shadow: 0 20px 48px rgba(255,150,56,.22);
+}
+.app-icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer {
+  background: var(--graphite);
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 28px clamp(20px, 5vw, 80px);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px;
+}
+.footer-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: 14px; color: rgba(242,244,247,.55);
+}
+.footer-logo img { width: 24px; height: 24px; border-radius: 6px; }
+.footer-logo span { color: var(--orange); }
+.footer-links { display: flex; gap: 22px; list-style: none; }
+.footer-links a {
+  color: rgba(242,244,247,.3); text-decoration: none;
+  font-size: 13px; font-weight: 500; transition: color .2s;
+}
+.footer-links a:hover { color: rgba(242,244,247,.65); }
+.footer-copy { font-size: 12px; color: rgba(242,244,247,.2); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="logo.png" alt="Buildly Focus logo">
+    <span class="nav-logo-name">Buildly <span>Focus</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#sources">Sources</a></li>
+    <li><a href="#install" class="nav-cta">Download</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div style="max-width:1160px; margin:0 auto;">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Native iOS + macOS · Open source
+      </div>
+      <h1 class="display">One <em>clear</em><br>next step.</h1>
+      <p class="hero-sub">
+        Buildly Focus gathers work from email, calendar, notes, and AI tools — then surfaces what actually deserves your attention right now.
+      </p>
+      <div class="hero-actions">
+        <a href="#install" class="btn-primary">Download for macOS</a>
+        <a href="https://github.com/buildlyio/focus" class="btn-secondary">View on GitHub</a>
+      </div>
+      <div class="hero-platforms">
+        <span>Available on</span>
+        <span class="platform-tag">macOS</span>
+        <span class="platform-tag">iOS</span>
+        <span class="platform-tag">iPadOS</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="flow.png" alt="Work from email, notes, and calendar converging into one clear focus beam">
+      <div class="hero-logo-badge">
+        <img src="logo.png" alt="Buildly Focus app icon">
+        <div>
+          <div class="hero-logo-badge-text">Buildly Focus</div>
+          <div class="hero-logo-badge-sub">One clear next step</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STRIP -->
+<div class="strip">
+  <div>CALM, NOT EMPTY</div>
+  <div><strong>·</strong></div>
+  <div>EXPLAIN THE PRIORITY</div>
+  <div><strong>·</strong></div>
+  <div>NATIVE EVERYWHERE</div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="eyebrow">How it works</div>
+      <h2 class="display">A decision,<br>not a list.</h2>
+      <p>Focus reduces the cost of deciding what to do. It gathers, normalises, and ranks work — but keeps you in control of the final order.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Collect</h3>
+        <p>Keep the original source visible. Work imported from email, calendar, and notes should never feel like it disappeared into a black box.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Explain</h3>
+        <p>Show the reason: deadline, impact, dependency, energy, and the time currently available to you.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Focus</h3>
+        <p>One best next step, a short queue, and an easy way to adjust or defer the recommendation — so Focus guides, not commands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-alt">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="eyebrow">Features</div>
+      <h2 class="display">Built around<br>intent.</h2>
+      <p>Every component answers what it is, why it matters now, how long it takes, and what happens when focus begins.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon fi-orange">📥</div>
+        <h3>Unified Inbox</h3>
+        <p>Email, calendar blocks, and note action items land in one queue — with real triage actions, not just "open in Gmail."</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-aqua">🔍</div>
+        <h3>Notes Scanner</h3>
+        <p>Paste from Apple Notes, Obsidian, Buildly Ink, or Gemini Notes. Focus extracts the tasks buried in your writing automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-green">🎯</div>
+        <h3>Today View</h3>
+        <p>One recommended task above the fold. A short queue beneath it. Everything else tucked away until you're ready.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-orange">⚡</div>
+        <h3>Priority Reasons</h3>
+        <p>"This unblocks two teammates" beats an opaque AI score. Plain-language explanations accompany every rank.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-aqua">🧠</div>
+        <h3>Learning Layer</h3>
+        <p>Every time you deprioritise or dismiss a suggestion, Focus adjusts. Recommendations sharpen without configuration.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-green">✏️</div>
+        <h3>Quick Capture</h3>
+        <p>Add any task before the thought disappears — from the tab bar, a widget, or a keyboard shortcut on Mac.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section id="sources">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="eyebrow">Connected sources</div>
+      <h2 class="display">Bring everything in.<br>Choose one thing well.</h2>
+      <p>Focus connects to the tools you already use. Every imported item keeps its source link so you can always get back to the original.</p>
+    </div>
+    <div class="sources-row">
+      <div class="source-chip"><div class="sc-dot"></div>Gmail</div>
+      <div class="source-chip"><div class="sc-dot"></div>Apple Notes</div>
+      <div class="source-chip"><div class="sc-dot"></div>Obsidian</div>
+      <div class="source-chip"><div class="sc-dot"></div>Google Calendar</div>
+      <div class="source-chip"><div class="sc-dot"></div>Buildly Ink</div>
+      <div class="source-chip"><div class="sc-dot"></div>Gemini Notes</div>
+      <div class="source-chip"><div class="sc-dot"></div>Todoist</div>
+      <div class="source-chip"><div class="sc-dot"></div>Apple Reminders</div>
+      <div class="source-chip"><div class="sc-dot"></div>Google Drive</div>
+      <div class="source-chip"><div class="sc-dot"></div>Google Tasks</div>
+      <div class="source-chip" style="border-style:dashed;color:var(--text3);">+ more coming</div>
+    </div>
+
+    <div class="demo-wrap">
+      <div class="demo-label">
+        <div class="eyebrow">Priority states</div>
+        <p>Focus Now, Up Next, and Complete use semantic labels with color — never color alone — so state reads at a glance.</p>
+      </div>
+      <div class="demo-card">
+        <div class="demo-task">
+          <div class="demo-circle" style="border-color:var(--orange)"></div>
+          <div class="demo-task-body">
+            <div class="demo-task-title">Confirm release notes with team</div>
+            <div class="demo-task-meta">Labs · Due today · 15 min</div>
+          </div>
+          <div class="demo-badge badge-now">Focus Now</div>
+        </div>
+        <div class="demo-task">
+          <div class="demo-circle"></div>
+          <div class="demo-task-body">
+            <div class="demo-task-title">Review grant application draft</div>
+            <div class="demo-task-meta">Notes · Tomorrow · 30 min</div>
+          </div>
+          <div class="demo-badge badge-next">Up Next</div>
+        </div>
+        <div class="demo-task">
+          <div class="demo-circle" style="border-color:var(--green);background:var(--green)"></div>
+          <div class="demo-task-body">
+            <div class="demo-task-title" style="text-decoration:line-through;opacity:.4">Send weekly summary email</div>
+            <div class="demo-task-meta">Gmail · Done 2 h ago</div>
+          </div>
+          <div class="demo-badge badge-done">Complete</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD CTA -->
+<section id="install" class="cta-section">
+  <div class="section-inner">
+    <div class="app-icon-wrap"><img src="logo.png" alt="Buildly Focus"></div>
+    <div class="cta-badge">Open source · Free to use</div>
+    <h2 class="display cta-h2">Start with one<br><em>clear</em> next step.</h2>
+    <p class="cta-sub">Install in under a minute. Runs locally — your data stays yours.</p>
+    <div class="install-block" id="installCmd" onclick="copyInstall()">
+      <span class="install-prompt">$ </span>curl -fsSL https://buildly.io/focus/install.sh | bash
+    </div>
+    <div class="cta-actions">
+      <a href="#" class="btn-primary" style="font-size:16px;padding:14px 32px;">Download for macOS</a>
+      <a href="https://github.com/buildlyio/focus" class="btn-secondary-dark">View on GitHub</a>
+    </div>
+    <p class="cta-fine">macOS 13+ · iOS 17+ · iPadOS 17+</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="logo.png" alt="">
+    Buildly <span>Focus</span>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="https://github.com/buildlyio/focus">GitHub</a></li>
+    <li><a href="https://buildly.io">buildly.io</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Buildly Labs</div>
+</footer>
+
+<script>
+function copyInstall() {
+  const cmd = 'curl -fsSL https://buildly.io/focus/install.sh | bash';
+  navigator.clipboard.writeText(cmd).then(() => {
+    const el = document.getElementById('installCmd');
+    el.style.background = 'rgba(94,219,229,.08)';
+    el.style.borderColor = 'rgba(94,219,229,.28)';
+    setTimeout(() => {
+      el.style.background = '';
+      el.style.borderColor = '';
+    }, 1400);
+  });
+}
+</script>
+</body>
+</html>
